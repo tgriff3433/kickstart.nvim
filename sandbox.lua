@@ -685,13 +685,8 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        ts_ls = {},
-        -- possible other things we might want for nextjs development, work with these one at a time to understand how they are working better
-        -- eslint = {},
-        -- tailwindcss = {},
-        -- jsonls = {},
-        -- html = {},
-        -- cssls = {},
+        -- ts_ls = {},
+        --
 
         lua_ls = {
           -- cmd = { ... },
@@ -821,7 +816,6 @@ require('lazy').setup({
     },
     --- @module 'blink.cmp'
     --- @type blink.cmp.Config
-    ---
     opts = {
       keymap = {
         -- 'default' (recommended) for mappings similar to built-in completions
