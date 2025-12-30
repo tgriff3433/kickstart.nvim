@@ -151,7 +151,8 @@ vim.o.splitbelow = true
 --   and `:help lua-options-guide`
 vim.o.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
+vim.o.number = true
+vim.o.relativenumber = true
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
 
@@ -159,7 +160,7 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 10
+vim.o.scrolloff = 999
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -205,7 +206,31 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
--- [[ Basic Autocommands ]]
+-- pasting over selection fix
+vim.keymap.set('x', '<leader>p', '"_dP', { desc = 'Paste without yanking' })
+vim.keymap.set('n', '<leader>P', '"_dP', { desc = 'Paste without yanking (normal)' })
+
+-- lazygit bind, autocloses terminal buffer when you exit lazygit.
+vim.keymap.set('n', '<leader>gg', function()
+  local prev_tab = vim.api.nvim_get_current_tabpage()
+
+  vim.cmd 'tabnew'
+  vim.cmd 'terminal lazygit'
+  vim.cmd 'startinsert'
+
+  local term_buf = vim.api.nvim_get_current_buf()
+
+  vim.api.nvim_create_autocmd('TermClose', {
+    buffer = term_buf,
+    once = true,
+    callback = function()
+      vim.cmd 'tabclose'
+      if vim.api.nvim_tabpage_is_valid(prev_tab) then
+        vim.api.nvim_set_current_tabpage(prev_tab)
+      end
+    end,
+  })
+end, { desc = 'Open lazygit' })
 --  See `:help lua-guide-autocommands`
 
 -- Highlight when yanking (copying) text
@@ -411,11 +436,19 @@ require('lazy').setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          file_ignore_patterns = {
+            'node_modules',
+            '%.git/',
+            'dist',
+            'build',
+            '%.lock',
+          },
+
+          mappings = {
+            --    i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
